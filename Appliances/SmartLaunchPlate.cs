@@ -32,7 +32,7 @@ namespace LaunchIt.Appliances
                 },
                 new()
                 {
-                    Title = "Slow",
+                    Title = "Sticky",
                     Description = "Performs <sprite name=\"launcher_0\"> 50% slower."
                 }
             }, new()))
@@ -41,7 +41,7 @@ namespace LaunchIt.Appliances
         public override bool IsPurchasable => true;
         public override bool IsPurchasableAsUpgrade => true;
         public override PriceTier PriceTier => PriceTier.VeryExpensive;
-        public override int PurchaseCostOverride => 350;
+        public override int PurchaseCostOverride => 500;
         public override RarityTier RarityTier => RarityTier.Rare;
         public override ShoppingTags ShoppingTags => ShoppingTags.Automation;
 

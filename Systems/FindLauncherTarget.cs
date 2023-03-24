@@ -1,5 +1,6 @@
 ﻿using Kitchen;
 using KitchenMods;
+using LaunchIt.Appliances;
 using LaunchIt.Components;
 using System.Linq;
 using Unity.Collections;
@@ -54,8 +55,11 @@ namespace LaunchIt.Systems
                     Entity occupant = GetOccupant(targetPos);
                     if (occupant == default(Entity) ||
                         !Require<CAppliance>(occupant, out var cAppliance) || !Require<CItemHolder>(occupant, out var cHolder) ||
-                        !(cLauncher.TargetSmart && cLauncher.SmartTargetID == cAppliance.ID) ||
                         Has<CPreventItemTransfer>(occupant))
+                        continue;
+
+                    // Check target type
+                    if (!(cLauncher.TargetSmart && cLauncher.SmartTargetID == cAppliance.ID) && !(!cLauncher.TargetSmart && cAppliance.ID == Depot.DepotID))
                         continue;
 
                     // Disallow multi-targetting for Smart Launchers

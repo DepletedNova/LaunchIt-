@@ -5,8 +5,6 @@ global using static KitchenLib.Utils.MaterialUtils;
 global using static LaunchIt.Main;
 using KitchenLib;
 using KitchenLib.Customs;
-using KitchenLib.Event;
-using KitchenLib.References;
 using KitchenMods;
 using System.Linq;
 using System.Reflection;

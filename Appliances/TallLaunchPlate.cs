@@ -22,7 +22,7 @@ namespace LaunchIt.Appliances
                 {
                     Title = "Launching",
                     Description = "Launches items to any target location in front of itself.",
-                    RangeDescription = "Can reach up to 4 tiles"
+                    RangeDescription = "Can reach up to 6 tiles"
                 },
                 new()
                 {
@@ -52,10 +52,10 @@ namespace LaunchIt.Appliances
             new CItemHolder(),
             new CItemLauncher
             {
-                TileRange = 4,
+                TileRange = 6,
                 Cooldown = 0.75f,
                 CrossesWalls = true,
-                LaunchSpeed = 1.5f
+                LaunchSpeed = 0.5f
             },
             new CTakesDuration
             {
@@ -84,7 +84,7 @@ namespace LaunchIt.Appliances
             var launchView = Prefab.TryAddComponent<LauncherView>();
             launchView.HoldPoint = Prefab.TryAddComponent<HoldPointContainer>().HoldPoint = Prefab.transform.Find("HoldPoint");
             launchView.LaunchAnimator = Prefab.GetComponent<Animator>();
-            launchView.HeightMulti = 10f;
+            launchView.HeightMulti = 1f;
         }
     }
 }
