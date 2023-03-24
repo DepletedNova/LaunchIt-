@@ -33,7 +33,7 @@ namespace LaunchIt.Appliances
             }, new()))
         };
         public override bool IsPurchasable => true;
-        public override PriceTier PriceTier => PriceTier.Expensive;
+        public override PriceTier PriceTier => PriceTier.VeryExpensive;
         public override RarityTier RarityTier => RarityTier.Uncommon;
         public override ShoppingTags ShoppingTags => ShoppingTags.Automation;
 

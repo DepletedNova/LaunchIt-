@@ -27,7 +27,7 @@ namespace LaunchIt.Appliances
                 new()
                 {
                     Title = "Overarching",
-                    Description = "Items can be launched over walls onto any depot."
+                    Description = "Items can be launched over walls onto the first depot."
                 },
                 new()
                 {
@@ -38,7 +38,7 @@ namespace LaunchIt.Appliances
         };
         public override bool IsPurchasable => true;
         public override bool IsPurchasableAsUpgrade => true;
-        public override PriceTier PriceTier => PriceTier.Expensive;
+        public override PriceTier PriceTier => PriceTier.VeryExpensive;
         public override RarityTier RarityTier => RarityTier.Rare;
         public override ShoppingTags ShoppingTags => ShoppingTags.Automation;
 
