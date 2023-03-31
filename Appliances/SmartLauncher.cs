@@ -6,48 +6,40 @@ using LaunchIt.Processes;
 using LaunchIt.Views;
 using System.Collections.Generic;
 using UnityEngine;
-using static LaunchIt.Components.CItemLauncher;
 
 namespace LaunchIt.Appliances
 {
-    public class SmartLaunchPlate : CustomAppliance
+    public class SmartLauncher : CustomAppliance
     {
         public override string UniqueNameID => "smart_launch_plate";
         public override GameObject Prefab => GetPrefab("Smart Launch Plate");
         public override List<(Locale, ApplianceInfo)> InfoList => new()
         {
-            (Locale.English, CreateApplianceInfo("Smart Launch Plate", "It knows where to aim!", new()
+            (Locale.English, CreateApplianceInfo("Smart Launcher", "Place an appliance on it to set its target! Does not launch over walls.", new()
             {
                 new()
                 {
-                    Title = "Launching",
-                    Description = "Launches items to any target location in front of itself.",
-                    RangeDescription = "Can reach up to 4 tiles"
-                },
-                new()
-                {
                     Title = "Smart",
-                    Description = "Items will only launch to the first target of the set type.",
-                    RangeDescription = "Set in Prep Phase"
+                    Description = "Items will only launch to the first target of the set type",
+                    RangeDescription = "3 - 8 Tiles"
                 },
                 new()
                 {
                     Title = "Sticky",
-                    Description = "Performs <sprite name=\"launcher_0\"> 50% slower."
+                    Description = "<color=#ff1111>50%</color> slower <sprite name=\"launcher_0\">"
                 }
             }, new()))
         };
 
         public override bool IsPurchasable => true;
-        public override bool IsPurchasableAsUpgrade => true;
         public override PriceTier PriceTier => PriceTier.VeryExpensive;
-        public override int PurchaseCostOverride => 500;
+        public override int PurchaseCostOverride => 600;
         public override RarityTier RarityTier => RarityTier.Rare;
         public override ShoppingTags ShoppingTags => ShoppingTags.Automation;
 
         public override List<Appliance> Upgrades => new()
         {
-            GetCastedGDO<Appliance, LaunchPlate>()
+            GetCastedGDO<Appliance, Launcher>()
         };
 
         public override List<IApplianceProperty> Properties => new()
@@ -55,16 +47,17 @@ namespace LaunchIt.Appliances
             new CItemHolder(),
             new CItemLauncher
             {
-                TileRange = 4,
-                Cooldown = 1.50f,
+                MaxTileRange = 8,
+                MinTileRange = 2,
                 TargetSmart = true,
-                LaunchSpeed = 0.35f
+                SingleTarget = true,
+                Cooldown = 1.50f,
+                LaunchSpeed = 1.0f
             },
             new CTakesDuration
             {
                 IsInverse = true,
                 Mode = InteractionMode.Items,
-                Manual = false,
             },
             new CDisplayDuration
             {

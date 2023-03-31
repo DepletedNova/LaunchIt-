@@ -7,8 +7,6 @@ using static LaunchIt.Components.CItemLauncher;
 namespace LaunchIt.Systems
 {
     [UpdateBefore(typeof(PickUpAndDropAppliance))]
-    [UpdateBefore(typeof(StoreBlueprint))]
-    [UpdateBefore(typeof(RetrieveBlueprint))]
     public class SwapSmartLauncherTarget : ApplianceInteractionSystem, IModSystem
     {
         private CItemHolder cHolder;
@@ -19,8 +17,12 @@ namespace LaunchIt.Systems
         {
             if (!Require(data.Interactor, out cHolder) || !Require(data.Target, out cLauncher) || cHolder.HeldItem == Entity.Null ||!Require(cHolder.HeldItem, out cAppliance) ||
                 !cLauncher.TargetSmart || cLauncher.SmartTargetID == cAppliance.ID || cLauncher.State != LauncherState.Idle ||
-                Has<CApplianceBlueprint>(cHolder.HeldItem) || Has<CApplyDecor>(cHolder.HeldItem) || !Has<CItemHolder>(cHolder.HeldItem))
+                Has<CApplianceBlueprint>(cHolder.HeldItem) || Has<CApplyDecor>(cHolder.HeldItem))
                 return false;
+
+            if (!(Has<CItemHolder>(cHolder.HeldItem) || Has<CItemProvider>(cHolder.HeldItem) || Has<CApplianceBin>(cHolder.HeldItem)))
+                return false;
+
             return true;
         }
 

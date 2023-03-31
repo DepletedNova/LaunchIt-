@@ -14,6 +14,7 @@ namespace LaunchIt.Systems
         private EntityQuery Launchers;
         protected override void Initialise()
         {
+            base.Initialise();
             Launchers = GetEntityQuery(new QueryHelper()
                 .All(typeof(CItemLauncher), typeof(CTakesDuration), typeof(CItemHolder)));
         }

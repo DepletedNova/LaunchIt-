@@ -5,8 +5,10 @@ using KitchenMods;
 using LaunchIt.Appliances;
 using LaunchIt.Components;
 using MessagePack;
+using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 using static LaunchIt.Components.CItemLauncher;
 
@@ -21,11 +23,15 @@ namespace LaunchIt.Views
         protected LauncherState State = LauncherState.Idle;
         protected Vector3 HoldPointOffset;
 
+        protected Vector2 StartPosition;
+        protected Vector2 TargetPosition;
+        protected Vector2 ControlPosition;
+
         public Transform HoldPoint;
 
         public Animator LaunchAnimator;
         public Transform SmartHoldPoint;
-        public float HeightMulti = 0.35f;
+        public float HeightMulti = 0.25f;
 
         private static readonly int Launched = Animator.StringToHash("Launched");
 
@@ -40,15 +46,21 @@ namespace LaunchIt.Views
                 var SignalPrefab = Instantiate(appliance.Prefab, SmartHoldPoint);
                 SignalPrefab.transform.SetParent(SmartHoldPoint, false);
                 SignalPrefab.transform.localPosition = Vector3.zero;
-                SignalPrefab.transform.localScale = Vector3.one * 0.2f;
+                SignalPrefab.transform.localScale = Vector3.one * 0.25f;
             }
         }
 
         protected override void UpdateData(ViewData viewData)
         {
-            if (SmartHoldPoint != null && viewData.TargetType != (int)Target)
+            if (SmartHoldPoint != null && viewData.TargetType != Target)
             {
                 UpdateSmartTarget(viewData.TargetType);
+            }
+
+            if (viewData.Distance != Distance)
+            {
+                TargetPosition = new Vector2(viewData.Distance, 0.5f);
+                ControlPosition = new Vector2(viewData.Distance / 2.0f, Mathf.Max(viewData.Distance / 1.75f, viewData.Distance / (math.pow(1.75f, viewData.Distance) * 0.15f)));
             }
 
             Delta = viewData.Delta;
@@ -65,6 +77,7 @@ namespace LaunchIt.Views
             if (HoldPointOffset == null || HoldPointOffset == default(Vector3))
             {
                 HoldPointOffset = HoldPoint.localPosition;
+                StartPosition = new Vector2(-HoldPoint.localPosition.z, HoldPoint.localPosition.y);
             } else if (State != LauncherState.Launching)
             {
                 HoldPoint.localPosition = HoldPointOffset;
@@ -75,11 +88,10 @@ namespace LaunchIt.Views
         {
             if (State == LauncherState.Launching)
             {
-                Delta -= Time.deltaTime;
-                var max = Distance * Speed;
-                var x = Distance * Delta / -max + Distance;
+                Delta -= Time.deltaTime * Speed;
 
-                HoldPoint.localPosition = -Vector3.forward * x + Vector3.up * (HoldPointOffset.y + x * (-x + Distance) * HeightMulti);
+                var point = GenericHelper.QuadraticBezier(StartPosition, ControlPosition, TargetPosition, 1.0f - Delta);
+                HoldPoint.localPosition = new Vector3(0, point.y, -point.x);
             }
         }
 

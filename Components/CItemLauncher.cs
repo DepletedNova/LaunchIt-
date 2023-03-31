@@ -10,9 +10,12 @@ namespace LaunchIt.Components
         // Appliance Variables
         public bool TargetSmart;
         public bool CrossesWalls;
-        public int TileRange;
         public float Cooldown;
         public float LaunchSpeed;
+        public int MaxTileRange;
+        public int MinTileRange;
+        public bool SingleTarget;
+        public bool TargetFar;
 
         // Generic
         public float FlightDelta;

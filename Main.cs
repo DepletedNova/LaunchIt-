@@ -3,12 +3,18 @@ global using static KitchenLib.Utils.GDOUtils;
 global using static KitchenLib.Utils.LocalisationUtils;
 global using static KitchenLib.Utils.MaterialUtils;
 global using static LaunchIt.Main;
+using KitchenData;
 using KitchenLib;
 using KitchenLib.Customs;
+using KitchenLib.Event;
+using KitchenLib.References;
 using KitchenMods;
+using LaunchIt.Appliances;
+using LaunchIt.Processes;
 using System.Linq;
 using System.Reflection;
 using TMPro;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace LaunchIt
@@ -16,7 +22,7 @@ namespace LaunchIt
     public class Main : BaseMod
     {
         public const string GUID = "nova.launchit";
-        public const string VERSION = "1.0.0";
+        public const string VERSION = "2.0.1";
 
         public Main() : base(GUID, "LaunchIt!", "Depleted Supernova#1957", VERSION, ">=1.0.0", Assembly.GetExecutingAssembly()) { }
 
@@ -31,6 +37,11 @@ namespace LaunchIt
             AddGameData();
 
             AddIcons();
+
+            Events.BuildGameDataEvent += (_, args) =>
+            {
+                AddDepot();
+            };
         }
 
         internal void AddGameData()
@@ -61,6 +72,12 @@ namespace LaunchIt
             icons.material.mainTexture = Bundle.LoadAsset<Texture2D>("LaunchTex");
         }
 
+        private void AddDepot()
+        {
+            (GetExistingGDO(ApplianceReferences.Countertop) as Appliance).Upgrades.Add(GetCastedGDO<Appliance, Depot>());
+            (GetExistingGDO(ApplianceReferences.Dumbwaiter) as Appliance).Upgrades.Add(GetCastedGDO<Appliance, Launcher>());
+        }
+
         public static GameObject GetPrefab(string name) => Bundle.LoadAsset<GameObject>(name);
     }
 
@@ -74,6 +91,36 @@ namespace LaunchIt
             counter.ApplyMaterial("Wood - Default", "Wood 4 - Painted", "Wood 4 - Painted");
             counter.ApplyMaterialToChild("Handle", "Knob");
             counter.ApplyMaterialToChild("Countertop", "Wood - Default");
+        }
+
+        public static Vector2 QuadraticBezier(Vector2 p0, Vector2 p1, Vector2 p2, float t)
+        {
+            float m = 1.0f - t;
+            float a = m * m;
+            float b = 2.0f * m * t;
+            float c = t * t;
+            float x = a * p0.x + b * p1.x + c * p2.x;
+            float y = a * p0.y + b * p1.y + c * p2.y;
+            return new(x, y);
+        }
+
+        private static GameObject TeleporterLabel;
+        public static GameObject AddLabel(this GameObject parent, Vector3 Position, Quaternion Rotation)
+        {
+            // Initialize label
+            if (TeleporterLabel == null)
+            {
+                TeleporterLabel = (GetExistingGDO(ApplianceReferences.Teleporter) as Appliance).Prefab.GetChild("Label 1");
+            }
+
+            var label = Object.Instantiate(TeleporterLabel);
+            label.transform.parent = parent.transform;
+            label.transform.localPosition = Position;
+            label.transform.localRotation = Rotation;
+            label.transform.localScale *= 0.8f;
+            label.name = "Label";
+            label.SetActive(true);
+            return label;
         }
     }
 }

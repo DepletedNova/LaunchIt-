@@ -1,6 +1,8 @@
 ﻿using Kitchen;
+using KitchenData;
 using KitchenMods;
 using LaunchIt.Components;
+using MessagePack.Formatters;
 using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
@@ -8,13 +10,14 @@ using static LaunchIt.Components.CItemLauncher;
 
 namespace LaunchIt.Systems
 {
-    [UpdateBefore(typeof(InteractionGroup))]
+    [UpdateAfter(typeof(InteractionGroup))]
     public class LaunchItems : GameSystemBase, IModSystem
     {
         private EntityContext ctx;
         private EntityQuery Launchers;
         protected override void Initialise()
         {
+            base.Initialise();
             Launchers = GetEntityQuery(new QueryHelper()
                 .All(typeof(CItemLauncher), typeof(CTakesDuration), typeof(CItemHolder)));
         }
@@ -33,27 +36,34 @@ namespace LaunchIt.Systems
                 Require<CItemHolder>(entity, out var cHolder);
 
                 // Update 
-                if (cHolder.HeldItem == default(Entity) || cLauncher.CurrentTarget == default(Entity) || cLauncher.State == LauncherState.Reloading)
+                if (cLauncher.CurrentTarget == Entity.Null || cLauncher.State == LauncherState.Reloading || cHolder.HeldItem == Entity.Null)
+                    continue;
+
+                if (cLauncher.State != LauncherState.Launching && Has<CPreventItemTransfer>(cLauncher.CurrentTarget))
+                    continue;
+
+                bool hasBin = Require<CApplianceBin>(cLauncher.CurrentTarget, out var cBin);
+                if (hasBin && Require<CItem>(cHolder.HeldItem, out var cItem) && Data.TryGet<Item>(cItem.ID, out var ItemData) && ItemData.IsIndisposable)
                     continue;
 
                 // Activate if idle
                 if (cLauncher.State == LauncherState.Idle)
                 {
-                    cLauncher.FlightDelta = cLauncher.LaunchSpeed * cLauncher.LaunchDistance;
+                    cLauncher.FlightDelta = 1.0f;
                     cLauncher.State = LauncherState.Launching;
                     Set(entity, new CPreventItemTransfer());
                     Set(cLauncher.CurrentTarget, new CPreventItemTransfer());
                 }
 
                 // Tick flight
-                cLauncher.FlightDelta -= Time.DeltaTime;
+                cLauncher.FlightDelta -= Time.DeltaTime * cLauncher.LaunchSpeed;
                 
                 // Upon flight ending
-                if (cLauncher.FlightDelta <= 0)
+                if (cLauncher.FlightDelta <= 0f)
                 {
                     // Begin cooldown
                     Require<CTakesDuration>(entity, out var cDuration);
-                    var cooldown = cLauncher.Cooldown * 3f;
+                    var cooldown = cLauncher.Cooldown * 1.75f;
                     cDuration.Total = cooldown;
                     cDuration.Remaining = cooldown;
                     Set(entity, cDuration);
@@ -65,11 +75,40 @@ namespace LaunchIt.Systems
                     EntityManager.RemoveComponent<CPreventItemTransfer>(cLauncher.CurrentTarget);
 
                     // Transport item between locations
-                    ctx.UpdateHolder(cHolder.HeldItem, cLauncher.CurrentTarget);
+                    if (Require<CItemHolder>(cLauncher.CurrentTarget, out var _))
+                    {
+                        if (Require(cLauncher.CurrentTarget, out CTrampoline cTrampoline))
+                        {
+                            cTrampoline.LaunchedTo = true;
+                            cTrampoline.Distance = cLauncher.LaunchDistance;
+                            cTrampoline.Orientation = GetComponent<CPosition>(entity).Rotation;
+                            Set(cLauncher.CurrentTarget, cTrampoline);
+                        }
+                        ctx.UpdateHolder(cHolder.HeldItem, cLauncher.CurrentTarget);
+                    } else if (Require<CItemProvider>(cLauncher.CurrentTarget, out var cProvider))
+                    {
+                        if (Has<CDynamicItemProvider>(cLauncher.CurrentTarget) && Require(cHolder.HeldItem, out CItem cHeldItem))
+                        {
+                            cProvider.ProvidedItem = cHeldItem.ID;
+                            cProvider.ProvidedComponents = cHeldItem.Items;
+                        }
+
+                        if (cProvider.Available < cProvider.Maximum)
+                            cProvider.Available++;
+                        ctx.Destroy(cHolder.HeldItem);
+                        Set(cLauncher.CurrentTarget, cProvider);
+                    } else if (hasBin)
+                    {
+                        cBin.CurrentAmount++;
+                        ctx.Destroy(cHolder.HeldItem);
+                        Set(cLauncher.CurrentTarget, cBin);
+                    }
                 }
 
                 Set(entity, cLauncher);
             }
         }
+
+
     }
 }

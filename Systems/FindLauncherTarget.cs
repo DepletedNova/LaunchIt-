@@ -1,4 +1,6 @@
 ﻿using Kitchen;
+using KitchenData;
+using KitchenLib.References;
 using KitchenMods;
 using LaunchIt.Appliances;
 using LaunchIt.Components;
@@ -10,12 +12,13 @@ using static LaunchIt.Components.CItemLauncher;
 
 namespace LaunchIt.Systems
 {
-    [UpdateAfter(typeof(LaunchItems))]
+    [UpdateBefore(typeof(LaunchItems))]
     public class FindLauncherTarget : GameSystemBase, IModSystem
     {
         private EntityQuery Launchers;
         protected override void Initialise()
         {
+            base.Initialise();
             Launchers = GetEntityQuery(new QueryHelper()
                 .All(typeof(CItemLauncher), typeof(CTakesDuration), typeof(CItemHolder))
                 .None(typeof(CPreventItemTransfer)));
@@ -36,39 +39,66 @@ namespace LaunchIt.Systems
                 Require<CPosition>(entity, out var cPos);
 
                 cLauncher.LaunchDistance = 0;
-                cLauncher.CurrentTarget = default(Entity);
+                cLauncher.CurrentTarget = Entity.Null;
+
+                Require<CItemHolder>(entity, out var cHolder);
+                if (cHolder.HeldItem == Entity.Null || !Require(cHolder.HeldItem, out CItem cItem) || !Data.TryGet(cItem.ID, out Item ItemData))
+                    continue;
 
                 // Check tiles in range
                 Vector3 prevPos = cPos.Position;
                 Vector3 targetPos;
-                for (int i = 1; i <= cLauncher.TileRange; i++)
+                bool inverse = cLauncher.TargetFar;
+                for (int i = inverse ? cLauncher.MaxTileRange + 1 : cLauncher.MinTileRange - 1; inverse ? i >= cLauncher.MinTileRange: i <= cLauncher.MaxTileRange;)
                 {
+                    if (inverse) i--;
+                    else i++;
+
                     targetPos = cPos.Forward(-i) + cPos.Position;
 
+                    if (targetPos == prevPos) continue;
+
                     // Check if valid position
-                    if (!cLauncher.CrossesWalls && !CanReach(prevPos, targetPos))
-                        break;
+                    if (!inverse && !cLauncher.CrossesWalls && !CanReach(prevPos, targetPos))
+                            break;
 
                     prevPos = targetPos;
 
                     // Check if ahead is a valid target
                     Entity occupant = GetOccupant(targetPos);
-                    if (occupant == default(Entity) ||
-                        !Require<CAppliance>(occupant, out var cAppliance) || !Require<CItemHolder>(occupant, out var cHolder) ||
-                        Has<CPreventItemTransfer>(occupant))
+                    if (occupant == Entity.Null || !Require<CAppliance>(occupant, out var cAppliance) || Has<CPreventItemTransfer>(occupant))
                         continue;
 
                     // Check target type
-                    if (!(cLauncher.TargetSmart && cLauncher.SmartTargetID == cAppliance.ID) && !(!cLauncher.TargetSmart && cAppliance.ID == Depot.DepotID))
+                    if (!ValidSmartTarget(cLauncher, occupant, cAppliance) && !ValidGenericTarget(cLauncher, occupant, cAppliance))
                         continue;
 
-                    // Disallow multi-targetting for Smart Launchers
-                    if (cHolder.HeldItem != default(Entity))
+                    // Check valid Target
+                    bool hasHolder = Require<CItemHolder>(occupant, out var cTargetHolder);
+                    bool hasGrabber = Require<CConveyPushItems>(occupant, out var cGrabber);
+                    bool hasProvider = Require<CItemProvider>(occupant, out var cProvider);
+                    bool hasBin = Require<CApplianceBin>(occupant, out var cBin);
+                    if (hasHolder || hasProvider || hasBin)
                     {
-                        if (cLauncher.TargetSmart || cLauncher.CrossesWalls)
-                            break;
-                        else continue;
+                        var heldItem = GetComponent<CItem>(cHolder.HeldItem);
+                        if (hasGrabber && cGrabber.GrabSpecificType && (heldItem.ID != cGrabber.SpecificType || !heldItem.Items.Equals(cGrabber.SpecificComponents)))
+                            continue;
+
+                        bool flag2 = (hasHolder && cTargetHolder.HeldItem == Entity.Null) ||
+                            (hasProvider && !cProvider.PreventReturns && (cProvider.Available < cProvider.Maximum || cProvider.Maximum == 0) &&
+                                ((Require(occupant, out CDynamicItemProvider cDynamicProvider) && cProvider.Available == 0 && ItemData.ItemStorageFlags == cDynamicProvider.StorageFlags) || 
+                                cProvider.ProvidedItem == cItem.ID && cProvider.ProvidedComponents.Equals(cItem.Items))) ||
+                            (hasBin && cBin.Capacity > cBin.CurrentAmount);
+
+                        if (!flag2)
+                        {
+                            // Single Target / Multi-Target
+                            if (cLauncher.SingleTarget)
+                                break;
+                            else continue;
+                        }
                     }
+                    else continue;
 
                     cLauncher.LaunchDistance = i;
                     cLauncher.CurrentTarget = occupant;
@@ -79,5 +109,12 @@ namespace LaunchIt.Systems
             }
         }
 
+        private bool ValidSmartTarget(CItemLauncher cLauncher, Entity Target, CAppliance cTargetAppliance) => 
+            cLauncher.TargetSmart && cLauncher.SmartTargetID == cTargetAppliance.ID;
+
+        private bool ValidGenericTarget(CItemLauncher cLauncher, Entity Target, CAppliance cTargetAppliance) => 
+            !cLauncher.TargetSmart && 
+            (Has<CItemLauncher>(Target) || cTargetAppliance.ID == ApplianceReferences.Countertop ||
+            cTargetAppliance.ID == Depot.StaticID || cTargetAppliance.ID == Trampoline.StaticID);
     }
 }

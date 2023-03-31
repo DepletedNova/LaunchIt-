@@ -5,12 +5,12 @@ using System.Collections.Generic;
 
 namespace LaunchIt.Processes
 {
-    public class LauncherProcess : CustomProcess
+    public class CannonProcess : CustomProcess
     {
-        public override string UniqueNameID => "launcher_cooldown_process";
+        public override string UniqueNameID => "cannon_cooldown_process";
         public override List<(Locale, ProcessInfo)> InfoList => new()
         {
-            (Locale.English, CreateProcessInfo("Launcher Cooldown", "<sprite name=\"launcher_0\">"))
+            (Locale.English, CreateProcessInfo("Cannon Cooldown", "<sprite name=\"cannon_0\">"))
         };
         public override bool CanObfuscateProgress => false;
     }

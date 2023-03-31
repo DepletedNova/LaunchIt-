@@ -5,11 +5,12 @@ using LaunchIt.Components;
 using LaunchIt.Processes;
 using LaunchIt.Views;
 using System.Collections.Generic;
+using Unity.Collections;
 using UnityEngine;
 
 namespace LaunchIt.Appliances
 {
-    public class LaunchPlate : CustomAppliance
+    public class Launcher : CustomAppliance
     {
         public static int LauncherID { get; private set; }
 
@@ -17,29 +18,30 @@ namespace LaunchIt.Appliances
         public override GameObject Prefab => GetPrefab("Launch Plate");
         public override List<(Locale, ApplianceInfo)> InfoList => new()
         {
-            (Locale.English, CreateApplianceInfo("Launch Plate", "Thwump and splat!", new()
+            (Locale.English, CreateApplianceInfo("Launcher", "Launches items to any counter, launcher, or trampoline!", new()
             {
                 new()
                 {
-                    Title = "Launching",
-                    Description = "Launches items to any target location in front of itself.",
-                    RangeDescription = "Can reach up to 8 tiles"
+                    Title = "Overarching",
+                    Description = "Launches over walls!",
+                    RangeDescription = "12 Tiles"
                 },
                 new()
                 {
-                    Title = "Varying",
-                    Description = "Items can only be launched towards depots but any depots ahead can be targeted."
+                    Title = "Variable",
+                    Description = "Interact to swap between single and multiple targetting types"
                 }
             }, new()))
         };
         public override bool IsPurchasable => true;
         public override PriceTier PriceTier => PriceTier.VeryExpensive;
+        public override int PurchaseCostOverride => 400;
         public override RarityTier RarityTier => RarityTier.Uncommon;
         public override ShoppingTags ShoppingTags => ShoppingTags.Automation;
 
         public override List<Appliance> Upgrades => new()
         {
-            GetCastedGDO<Appliance, TallLaunchPlate>()
+            GetCastedGDO<Appliance, Cannon>()
         };
 
         public override List<IApplianceProperty> Properties => new()
@@ -47,15 +49,20 @@ namespace LaunchIt.Appliances
             new CItemHolder(),
             new CItemLauncher
             {
-                TileRange = 8,
+                MaxTileRange = 12,
+                MinTileRange = 0,
+                CrossesWalls = true,
                 Cooldown = 1.0f,
-                LaunchSpeed = 0.35f
+                LaunchSpeed = 1.0f,
+            },
+            new CVariableLauncher
+            {
+                Switch = CVariableLauncher.Variable.SingleMultiple
             },
             new CTakesDuration
             {
                 IsInverse = true,
                 Mode = InteractionMode.Items,
-                Manual = false,
             },
             new CDisplayDuration
             {
@@ -73,6 +80,8 @@ namespace LaunchIt.Appliances
         {
             Prefab.ApplyCounterMaterials();
             Prefab.ApplyMaterialToChild("Base", "Wood 1");
+            Prefab.ApplyMaterialToChild("Antenna", "Metal Dark");
+            Prefab.ApplyMaterialToChild("Light", "Indicator Light");
             var plate = Prefab.GetChild("Plate");
             plate.ApplyMaterial("Metal- Shiny", "Metal Very Dark", "Metal");
             plate.ApplyMaterialToChild("Sigils", "Plastic - Yellow");
@@ -81,6 +90,8 @@ namespace LaunchIt.Appliances
             var launchView = Prefab.TryAddComponent<LauncherView>();
             launchView.HoldPoint = Prefab.TryAddComponent<HoldPointContainer>().HoldPoint = Prefab.transform.Find("HoldPoint");
             launchView.LaunchAnimator = Prefab.GetComponent<Animator>();
+
+            Prefab.TryAddComponent<VariableLauncherView>().Light = Prefab.GetChild("Light").GetComponent<MeshRenderer>();
         }
     }
 }
