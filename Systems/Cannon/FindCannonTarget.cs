@@ -36,15 +36,9 @@ namespace LaunchIt.Systems.Cannon
                 if (cCannon.State != CannonState.Idle || !CollectReceivers.Channels.ContainsKey(cChannel.Channel))
                     continue;
 
-                // Reset target if it is unavailable
-                if (cCannon.Target != Entity.Null && Require(cCannon.Target, out CItemHolder cTHolder))
-                {
-                    if (cTHolder.HeldItem != Entity.Null)
-                    {
-                        cCannon.Target = Entity.Null;
-                    }
-                    else continue; // don't calculate target if target is valid
-                }
+                // Do not recalculate if target is available
+                if (cCannon.Target != Entity.Null && Require(cCannon.Target, out CItemHolder cTHolder) && cTHolder.HeldItem == Entity.Null)
+                    continue;
 
                 // Cycle through potential targets
                 foreach (var pTarget in CollectReceivers.Channels[cChannel.Channel])
@@ -59,7 +53,7 @@ namespace LaunchIt.Systems.Cannon
 
                     // Check if in range
                     var cPPos = GetComponent<CPosition>(pTarget);
-                    var dist = Mathf.Round(Vector3.Distance(cPos.Position, cPPos.Position));
+                    var dist = Mathf.Ceil(Vector3.Distance(cPos.Position, cPPos.Position));
                     if (dist > cCannon.MaxRange || dist < cCannon.MinRange)
                         continue;
 

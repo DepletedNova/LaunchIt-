@@ -60,7 +60,6 @@ namespace LaunchIt.Systems.Cannon
 
                     cCannon.FlightDelta = 0f;
                     cCannon.State = CannonState.Reloading;
-                    cCannon.Target = Entity.Null;
 
                     Require<CTakesDuration>(entity, out var cDuration);
                     var cooldown = cCannon.Cooldown;
@@ -71,6 +70,8 @@ namespace LaunchIt.Systems.Cannon
 
                 Set(entity, cCannon);
             }
+
+            ctx.Dispose();
         }
     }
 }

@@ -22,9 +22,8 @@ namespace LaunchIt.Appliances
             {
                 new()
                 {
-                    Title = "Overarching",
-                    Description = "Launches over walls!",
-                    RangeDescription = "12 Tiles"
+                    Title = "Launching",
+                    RangeDescription = "16 Tiles"
                 },
                 new()
                 {
@@ -35,13 +34,13 @@ namespace LaunchIt.Appliances
         };
         public override bool IsPurchasable => true;
         public override PriceTier PriceTier => PriceTier.VeryExpensive;
-        public override int PurchaseCostOverride => 400;
+        public override int PurchaseCostOverride => 300;
         public override RarityTier RarityTier => RarityTier.Uncommon;
         public override ShoppingTags ShoppingTags => ShoppingTags.Automation;
 
         public override List<Appliance> Upgrades => new()
         {
-            GetCastedGDO<Appliance, Cannon>()
+            GetCastedGDO<Appliance, Launcher>()
         };
 
         public override List<IApplianceProperty> Properties => new()
@@ -49,7 +48,7 @@ namespace LaunchIt.Appliances
             new CItemHolder(),
             new CItemLauncher
             {
-                MaxTileRange = 12,
+                MaxTileRange = 16,
                 MinTileRange = 0,
                 CrossesWalls = true,
                 Cooldown = 1.0f,
@@ -91,7 +90,7 @@ namespace LaunchIt.Appliances
             launchView.HoldPoint = Prefab.TryAddComponent<HoldPointContainer>().HoldPoint = Prefab.transform.Find("HoldPoint");
             launchView.LaunchAnimator = Prefab.GetComponent<Animator>();
 
-            Prefab.TryAddComponent<VariableLauncherView>().Light = Prefab.GetChild("Light").GetComponent<MeshRenderer>();
+            //Prefab.TryAddComponent<VariableLauncherView>().Light = Prefab.GetChild("Light").GetComponent<MeshRenderer>();
         }
     }
 }

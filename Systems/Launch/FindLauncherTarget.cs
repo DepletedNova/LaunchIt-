@@ -113,8 +113,7 @@ namespace LaunchIt.Systems
             cLauncher.TargetSmart && cLauncher.SmartTargetID == cTargetAppliance.ID;
 
         private bool ValidGenericTarget(CItemLauncher cLauncher, Entity Target, CAppliance cTargetAppliance) => 
-            !cLauncher.TargetSmart && 
-            (Has<CItemLauncher>(Target) || cTargetAppliance.ID == ApplianceReferences.Countertop ||
-            cTargetAppliance.ID == Depot.StaticID || cTargetAppliance.ID == Trampoline.StaticID);
+            !cLauncher.TargetSmart && Has<CItemHolder>(Target) &&
+            (Has<CItemLauncher>(Target) || Has<CChannelUser>(Target) || cTargetAppliance.ID == ApplianceReferences.Countertop || cTargetAppliance.ID == Trampoline.StaticID);
     }
 }

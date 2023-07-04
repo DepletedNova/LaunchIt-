@@ -41,7 +41,6 @@ namespace LaunchIt.Systems.Cannon
                 cCannon.State = CannonState.Idle;
                 cCannon.FlightDelta = 0;
                 cCannon.RotationDelta = 0;
-                cCannon.Target = Entity.Null;
                 Set(entity, cCannon);
             }
         }

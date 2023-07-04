@@ -145,8 +145,8 @@ namespace LaunchIt.Views
             [Key(0)] public int State;
             [Key(1)] public Vector3 TargetPosition;
             [Key(2)] public float FlightDelta;
-            [Key(2)] public float RotationDelta;
-            [Key(3)] public float FireSpeed;
+            [Key(3)] public float RotationDelta;
+            [Key(4)] public float FireSpeed;
 
             public IUpdatableObject GetRelevantSubview(IObjectView view) => view.GetSubView<CannonView>();
 

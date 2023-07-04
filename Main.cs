@@ -22,7 +22,7 @@ namespace LaunchIt
     public class Main : BaseMod
     {
         public const string GUID = "nova.launchit";
-        public const string VERSION = "2.0.1";
+        public const string VERSION = "2.0.6";
 
         public Main() : base(GUID, "LaunchIt!", "Depleted Supernova#1957", VERSION, ">=1.0.0", Assembly.GetExecutingAssembly()) { }
 
@@ -40,7 +40,9 @@ namespace LaunchIt
 
             Events.BuildGameDataEvent += (_, args) =>
             {
-                AddDepot();
+                if (!args.firstBuild)
+                    return;
+                //AddUpgrades();
             };
         }
 
@@ -72,7 +74,7 @@ namespace LaunchIt
             icons.material.mainTexture = Bundle.LoadAsset<Texture2D>("LaunchTex");
         }
 
-        private void AddDepot()
+        private void AddUpgrades()
         {
             (GetExistingGDO(ApplianceReferences.Countertop) as Appliance).Upgrades.Add(GetCastedGDO<Appliance, Depot>());
             (GetExistingGDO(ApplianceReferences.Dumbwaiter) as Appliance).Upgrades.Add(GetCastedGDO<Appliance, Launcher>());
@@ -119,7 +121,6 @@ namespace LaunchIt
             label.transform.localRotation = Rotation;
             label.transform.localScale *= 0.8f;
             label.name = "Label";
-            label.SetActive(true);
             return label;
         }
     }

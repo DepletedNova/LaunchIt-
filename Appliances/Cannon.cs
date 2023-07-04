@@ -21,8 +21,7 @@ namespace LaunchIt.Appliances
                 new()
                 {
                     Title = "Gunpowder",
-                    Description = "Items are dispersed to the first available depot!",
-                    RangeDescription = "8 Tile Radius"
+                    RangeDescription = "12 Tile Radius"
                 },
                 new()
                 {
@@ -33,7 +32,7 @@ namespace LaunchIt.Appliances
         };
         public override bool IsPurchasable => true;
         public override PriceTier PriceTier => PriceTier.VeryExpensive;
-        public override int PurchaseCostOverride => 750;
+        public override int PurchaseCostOverride => 650;
         public override RarityTier RarityTier => RarityTier.Rare;
         public override ShoppingTags ShoppingTags => ShoppingTags.Automation;
 
@@ -49,9 +48,9 @@ namespace LaunchIt.Appliances
             new CFixedRotation(),
             new CCannon
             {
-                MaxRange = 8f,
+                MaxRange = 12f,
                 MinRange = 0f,
-                Cooldown = 1.5f,
+                Cooldown = 1.25f,
                 FireSpeed = 1,
             },
             new CChannelUser(),
@@ -90,6 +89,8 @@ namespace LaunchIt.Appliances
             cannon.Barrel = Frame.transform.Find("Cannon");
             cannon.Particles = Barrel.GetChild("Particle").GetComponent<ParticleSystem>();
             cannon.HoldPoint = Prefab.TryAddComponent<HoldPointContainer>().HoldPoint = Barrel.GetChild("HoldPoint").transform;
+
+            //Prefab.TryAddComponent<CannonRangeView>().RadiusObject = Prefab.GetChild("Range").ApplyMaterial("Neon Light - Red");
         }
     }
 }

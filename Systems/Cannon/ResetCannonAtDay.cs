@@ -7,7 +7,7 @@ using static LaunchIt.Components.CCannon;
 
 namespace LaunchIt.Systems.Cannon
 {
-    public class ResetCannonAtNight : StartOfNightSystem, IModSystem
+    public class ResetCannonAtDay : StartOfDaySystem, IModSystem
     {
         private EntityQuery Cannons;
         protected override void Initialise()
@@ -26,8 +26,6 @@ namespace LaunchIt.Systems.Cannon
             {
                 Require(entity, out CCannon cCannon);
                 Require(entity, out CTakesDuration duration);
-                if (cCannon.State == CannonState.Idle)
-                    continue;
 
                 if (Has<CPreventItemTransfer>(entity))
                     EntityManager.RemoveComponent<CPreventItemTransfer>(entity);

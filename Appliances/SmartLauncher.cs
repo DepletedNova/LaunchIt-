@@ -33,13 +33,13 @@ namespace LaunchIt.Appliances
 
         public override bool IsPurchasable => true;
         public override PriceTier PriceTier => PriceTier.VeryExpensive;
-        public override int PurchaseCostOverride => 600;
+        public override int PurchaseCostOverride => 550;
         public override RarityTier RarityTier => RarityTier.Rare;
         public override ShoppingTags ShoppingTags => ShoppingTags.Automation;
 
         public override List<Appliance> Upgrades => new()
         {
-            GetCastedGDO<Appliance, Launcher>()
+            GetCastedGDO<Appliance, Cannon>()
         };
 
         public override List<IApplianceProperty> Properties => new()
@@ -48,7 +48,7 @@ namespace LaunchIt.Appliances
             new CItemLauncher
             {
                 MaxTileRange = 8,
-                MinTileRange = 2,
+                MinTileRange = 3,
                 TargetSmart = true,
                 SingleTarget = true,
                 Cooldown = 1.50f,

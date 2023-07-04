@@ -63,7 +63,7 @@ namespace LaunchIt.Systems
                 {
                     // Begin cooldown
                     Require<CTakesDuration>(entity, out var cDuration);
-                    var cooldown = cLauncher.Cooldown * 1.75f;
+                    var cooldown = cLauncher.Cooldown;
                     cDuration.Total = cooldown;
                     cDuration.Remaining = cooldown;
                     Set(entity, cDuration);
@@ -75,7 +75,7 @@ namespace LaunchIt.Systems
                     EntityManager.RemoveComponent<CPreventItemTransfer>(cLauncher.CurrentTarget);
 
                     // Transport item between locations
-                    if (Require<CItemHolder>(cLauncher.CurrentTarget, out var _))
+                    if (Require<CItemHolder>(cLauncher.CurrentTarget, out var holder) && holder.HeldItem == Entity.Null)
                     {
                         if (Require(cLauncher.CurrentTarget, out CTrampoline cTrampoline))
                         {
@@ -107,6 +107,8 @@ namespace LaunchIt.Systems
 
                 Set(entity, cLauncher);
             }
+
+            ctx.Dispose();
         }
 
 

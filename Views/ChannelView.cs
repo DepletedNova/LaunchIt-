@@ -25,6 +25,7 @@ namespace LaunchIt.Views
 
             if (ChannelText != null)
             {
+                ChannelText.gameObject.SetActive(true);
                 ChannelText.text = data.ID == 0 ? "" : data.ID.ToString();
             }
         }

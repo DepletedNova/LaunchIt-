@@ -85,6 +85,8 @@ namespace LaunchIt.Systems
 
                 Set(entity, cTrampoline);
             }
+
+            ctx.Dispose();
         }
     }
 }
