@@ -18,7 +18,7 @@ namespace LaunchIt.Views
             RadiusObject.SetActive(data.ShowRadius);
         }
 
-        private class UpdateView : IncrementalViewSystemBase<ViewData>, IModSystem
+        private class UpdateView : IncrementalViewSystemBase<ViewData>//, IModSystem
         {
             private EntityQuery Cannons;
             protected override void Initialise()

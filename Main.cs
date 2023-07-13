@@ -22,7 +22,7 @@ namespace LaunchIt
     public class Main : BaseMod
     {
         public const string GUID = "nova.launchit";
-        public const string VERSION = "2.0.6";
+        public const string VERSION = "2.0.7";
 
         public Main() : base(GUID, "LaunchIt!", "Depleted Supernova#1957", VERSION, ">=1.0.0", Assembly.GetExecutingAssembly()) { }
 
