@@ -18,7 +18,7 @@ namespace LaunchIt.Views
             RadiusObject.SetActive(data.ShowRadius);
         }
 
-        private class UpdateView : IncrementalViewSystemBase<ViewData>//, IModSystem
+        private class UpdateView : IncrementalViewSystemBase<ViewData>, IModSystem
         {
             private EntityQuery Cannons;
             protected override void Initialise()
@@ -47,8 +47,6 @@ namespace LaunchIt.Views
         public struct ViewData : ISpecificViewData, IViewData.ICheckForChanges<ViewData>
         {
             [Key(0)] public bool ShowRadius;
-            [Key(1)] public FixedListInt128 TargetX;
-            [Key(2)] public FixedListInt128 TargetY;
 
             public IUpdatableObject GetRelevantSubview(IObjectView view) => view.GetSubView<CannonRangeView>();
 
