@@ -36,21 +36,18 @@ namespace LaunchIt.Views
             protected override void Initialise()
             {
                 Users = GetEntityQuery(new QueryHelper().All(typeof(CChannelUser), typeof(CLinkedView)));
+                RequireForUpdate(Users);
             }
 
             protected override void OnUpdate()
             {
-                if (Users.IsEmpty)
-                    return;
-
-                using var entities = Users.ToEntityArray(Allocator.Temp);
-                foreach (var entity in entities)
+                using var channels = Users.ToComponentDataArray<CChannelUser>(Allocator.Temp);
+                using var views = Users.ToComponentDataArray<CLinkedView>(Allocator.Temp);
+                for (int i = 0; i < channels.Length; ++i)
                 {
-                    var cUser = GetComponent<CChannelUser>(entity);
-                    var view = GetComponent<CLinkedView>(entity);
-                    SendUpdate(view, new()
+                    SendUpdate(views[i], new()
                     {
-                        ID = cUser.Channel
+                        ID = channels[i].Channel
                     }, MessageType.SpecificViewUpdate);
                 }
             }
@@ -59,7 +56,7 @@ namespace LaunchIt.Views
         [MessagePackObject(false)]
         public struct ViewData : ISpecificViewData, IViewData.ICheckForChanges<ViewData>
         {
-            [Key(0)] public int ID;
+            [Key(1)] public int ID;
 
             public IUpdatableObject GetRelevantSubview(IObjectView view) => view.GetSubView<ChannelView>();
 

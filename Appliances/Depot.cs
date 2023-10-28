@@ -1,6 +1,7 @@
 ﻿using Kitchen;
 using KitchenData;
 using KitchenLib.Customs;
+using KitchenLib.References;
 using LaunchIt.Components;
 using LaunchIt.Views;
 using System.Collections.Generic;
@@ -27,10 +28,16 @@ namespace LaunchIt.Appliances
                 }
             }, new()))
         };
-        public override bool IsPurchasable => true;
+        public override bool IsPurchasableAsUpgrade => true;
         public override PriceTier PriceTier => PriceTier.Medium;
         public override RarityTier RarityTier => RarityTier.Uncommon;
         public override ShoppingTags ShoppingTags => ShoppingTags.Automation;
+
+        public override List<Appliance> Upgrades => new()
+        {
+            GetExistingGDO(ApplianceReferences.Freezer) as Appliance,
+            GetExistingGDO(ApplianceReferences.Workstation) as Appliance
+        };
 
         public override List<IApplianceProperty> Properties => new()
         {

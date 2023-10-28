@@ -31,7 +31,7 @@ namespace LaunchIt.Appliances
             }, new()))
         };
 
-        public override bool IsPurchasable => true;
+        public override bool IsPurchasableAsUpgrade => true;
         public override PriceTier PriceTier => PriceTier.VeryExpensive;
         public override int PurchaseCostOverride => 550;
         public override RarityTier RarityTier => RarityTier.Rare;

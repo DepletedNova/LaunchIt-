@@ -115,25 +115,23 @@ namespace LaunchIt.Views
             protected override void Initialise()
             {
                 CannonQuery = GetEntityQuery(new QueryHelper().All(typeof(CCannon), typeof(CLinkedView)));
+                RequireForUpdate(CannonQuery);
             }
 
             protected override void OnUpdate()
             {
-                if (CannonQuery.IsEmpty)
-                    return;
-
-                using var cannons = CannonQuery.ToEntityArray(Allocator.Temp);
-                foreach (var entity in cannons)
+                using var cannons = CannonQuery.ToComponentDataArray<CCannon>(Allocator.Temp);
+                using var views = CannonQuery.ToComponentDataArray<CLinkedView>(Allocator.Temp);
+                for (int i = 0; i < cannons.Length; ++i)
                 {
-                    var cCannon = GetComponent<CCannon>(entity);
-                    var cView = GetComponent<CLinkedView>(entity);
-                    SendUpdate(cView, new()
+                    var cannon = cannons[i];
+                    SendUpdate(views[i], new()
                     {
-                        FireSpeed = cCannon.FireSpeed,
-                        State = (int)cCannon.State,
-                        TargetPosition = cCannon.Target == Entity.Null ? Vector3.zero : GetComponent<CPosition>(cCannon.Target).Position,
-                        FlightDelta = cCannon.FlightDelta,
-                        RotationDelta = cCannon.RotationDelta
+                        FireSpeed = cannon.FireSpeed,
+                        State = (int)cannon.State,
+                        TargetPosition = cannon.Target == Entity.Null ? Vector3.zero : GetComponent<CPosition>(cannon.Target).Position,
+                        FlightDelta = cannon.FlightDelta,
+                        RotationDelta = cannon.RotationDelta
                     }, MessageType.SpecificViewUpdate);
                 }
             }
@@ -142,11 +140,11 @@ namespace LaunchIt.Views
         [MessagePackObject(false)]
         public struct ViewData : ISpecificViewData, IViewData.ICheckForChanges<ViewData>
         {
-            [Key(0)] public int State;
-            [Key(1)] public Vector3 TargetPosition;
-            [Key(2)] public float FlightDelta;
-            [Key(3)] public float RotationDelta;
-            [Key(4)] public float FireSpeed;
+            [Key(1)] public int State;
+            [Key(2)] public Vector3 TargetPosition;
+            [Key(3)] public float FlightDelta;
+            [Key(4)] public float RotationDelta;
+            [Key(5)] public float FireSpeed;
 
             public IUpdatableObject GetRelevantSubview(IObjectView view) => view.GetSubView<CannonView>();
 

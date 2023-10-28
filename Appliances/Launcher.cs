@@ -40,7 +40,8 @@ namespace LaunchIt.Appliances
 
         public override List<Appliance> Upgrades => new()
         {
-            GetCastedGDO<Appliance, Launcher>()
+            GetCastedGDO<Appliance, SmartLauncher>(),
+            GetCastedGDO<Appliance, Cannon>(),
         };
 
         public override List<IApplianceProperty> Properties => new()

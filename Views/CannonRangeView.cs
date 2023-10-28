@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace LaunchIt.Views
 {
-    public class CannonRangeView : UpdatableObjectView<CannonRangeView.ViewData>
+    /*public class CannonRangeView : UpdatableObjectView<CannonRangeView.ViewData>
     {
         public GameObject RadiusObject;
 
@@ -18,7 +18,7 @@ namespace LaunchIt.Views
             RadiusObject.SetActive(data.ShowRadius);
         }
 
-        private class UpdateView : IncrementalViewSystemBase<ViewData>, IModSystem
+        *//*private class UpdateView : IncrementalViewSystemBase<ViewData>, IModSystem
         {
             private EntityQuery Cannons;
             protected override void Initialise()
@@ -41,7 +41,7 @@ namespace LaunchIt.Views
                     }, MessageType.SpecificViewUpdate);
                 }
             }
-        }
+        }*//*
 
         [MessagePackObject(false)]
         public struct ViewData : ISpecificViewData, IViewData.ICheckForChanges<ViewData>
@@ -52,5 +52,5 @@ namespace LaunchIt.Views
 
             public bool IsChangedFrom(ViewData check) => ShowRadius != check.ShowRadius;
         }
-    }
+    }*/
 }
