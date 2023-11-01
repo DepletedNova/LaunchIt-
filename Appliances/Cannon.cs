@@ -34,7 +34,7 @@ namespace LaunchIt.Appliances
         public override PriceTier PriceTier => PriceTier.VeryExpensive;
         public override int PurchaseCostOverride => 650;
         public override RarityTier RarityTier => RarityTier.Rare;
-        public override ShoppingTags ShoppingTags => ShoppingTags.Automation;
+        public override ShoppingTags ShoppingTags => ShoppingTags.Automation | ShoppingTags.Technology;
 
         public override List<Appliance> Upgrades => new()
         {

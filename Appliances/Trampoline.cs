@@ -27,8 +27,8 @@ namespace LaunchIt.Appliances
         };
         public override bool IsPurchasable => true;
         public override PriceTier PriceTier => PriceTier.Medium;
-        public override RarityTier RarityTier => RarityTier.Uncommon;
-        public override ShoppingTags ShoppingTags => ShoppingTags.Automation;
+        public override RarityTier RarityTier => RarityTier.Rare;
+        public override ShoppingTags ShoppingTags => ShoppingTags.Automation | ShoppingTags.Technology;
 
         public override List<IApplianceProperty> Properties => new()
         {
